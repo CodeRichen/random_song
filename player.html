@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>隨機播放影片</title>
+</head>
+<body>
+    <h1>🎵 隨機播放影片</h1>
+    <textarea id="videoList" rows="10" cols="60" placeholder="請貼上多個影片網址，每行一個"></textarea><br>
+    <button onclick="startRandom()">開始播放</button>
+
+    <div id="player" style="margin-top: 20px;"></div>
+
+    <script>
+        let playlist = [];
+        let currentIndex = 0;
+
+        function startRandom() {
+            const lines = document.getElementById("videoList").value.trim().split("\n");
+            playlist = lines.map(line => line.trim()).filter(line => line.includes("youtube.com/watch"));
+            shuffle(playlist);
+            playNext();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function playNext() {
+            if (currentIndex >= playlist.length) {
+                alert("✅ 播放完畢！");
+                return;
+            }
+            const url = playlist[currentIndex];
+            const videoId = new URL(url).searchParams.get("v");
+            document.getElementById("player").innerHTML =
+                `<iframe width="560" height="315"
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+                    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                </iframe>`;
+            currentIndex++;
+        }
+    </script>
+</body>
+</html>
