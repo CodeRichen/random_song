@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>YouTube Controller</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        input, button { font-size: 18px; padding: 10px; width: 80%; margin: 10px auto; }
+    </style>
+</head>
+<body>
+    <h1>🎶 YouTube Playlist Player</h1>
+    <form method="POST">
+        <input type="text" name="playlist_url" placeholder="Paste YouTube playlist URL">
+        <br>
+        <button type="submit">Start Playing</button>
+    </form>
+
+    {% if playing %}
+    <p>🔊 Now Playing...</p>
+    <a href="/next"><button>Next Song</button></a>
+    <a href="/stop"><button style="background: #f55; color: white;">Stop</button></a>
+    {% endif %}
+
+    <h2>🖥️ PC Remote Control</h2>
+    <button onclick="fetch('/volume/up')">Volume +</button>
+    <button onclick="fetch('/volume/down')">Volume -</button><br><br>
+    <img id="screenshot" src="" width="480"><br>
+    <button onclick="refreshScreenshot()">Refresh Screenshot</button>
+
+    <script>
+        function refreshScreenshot() {
+            const now = new Date().getTime();
+            document.getElementById("screenshot").src = "/screenshot?t=" + now;
+        }
+    </script>
+</body>
+</html>
