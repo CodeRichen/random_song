@@ -1,32 +1,45 @@
-from flask import Flask, send_file
+from flask import Flask, Response
 import pyautogui
-import os
+import cv2
+import numpy as np
+import time
 
 app = Flask(__name__)
 
-@app.route("/")
+def generate_frames():
+    while True:
+        # 擷取螢幕
+        screenshot = pyautogui.screenshot()
+
+        # 轉成 OpenCV 圖片
+        frame = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+
+        # 編碼成 JPEG
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+
+        # 傳送 multipart 資料
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        time.sleep(0.1)  # 控制 FPS（10fps）
+
+@app.route('/')
 def index():
     return '''
         <html>
-            <head><meta http-equiv="refresh" content="2"></head>
+            <head><title>螢幕串流畫面</title></head>
             <body>
-                <h2>電腦螢幕截圖</h2>
-                <img src="/screenshot" width="100%" />
+                <h1>即時螢幕畫面</h1>
+                <img src="/video_feed" width="100%">
             </body>
         </html>
     '''
 
-@app.route("/screenshot")
-def serve_screenshot():
-    try:
-        save_path = os.path.join(os.getcwd(), "screenshot.png")
-        screenshot = pyautogui.screenshot()
-        screenshot.save(save_path)
-        return send_file(save_path, mimetype="image/png")
-    except Exception as e:
-        return f"擷取失敗: {e}", 500
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    print("Flask 網頁啟動中…")
-    print("請在瀏覽器輸入：http://localhost:5000")
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host='0.0.0.0', port=8080)
