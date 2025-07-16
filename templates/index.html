@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Brave 隨機播放控制面板</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        input, button { font-size: 18px; padding: 10px; width: 80%; margin: 10px auto; }
+    </style>
+</head>
+<body>
+    <h1>🎶 Brave 播放清單播放器</h1>
+    <form method="POST">
+        <input type="text" name="playlist_url" placeholder="貼上 YouTube 播放清單網址">
+        <br>
+        <button type="submit">開始播放</button>
+    </form>
+
+    {% if playing %}
+    <p>🎧 播放中...</p>
+    <a href="/next"><button>下一首</button></a>
+    <a href="/stop"><button style="background: #f55; color: white;">停止播放</button></a>
+    {% endif %}
+</body>
+</html>
