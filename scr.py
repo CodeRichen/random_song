@@ -66,11 +66,20 @@ def click_mouse():
 def scroll():
     direction = request.form.get('direction')
     amount = int(request.form.get('amount', 0))
+    rel_x = float(request.form.get('x', 0.5))
+    rel_y = float(request.form.get('y', 0.5))
+    
+    # 將滑鼠移動到用戶手指的位置（螢幕中的對應相對位置）
+    abs_x = int(screen_width * rel_x)
+    abs_y = int(screen_height * rel_y)
+    pyautogui.moveTo(abs_x, abs_y)
+
     if direction == 'up':
         pyautogui.scroll(amount)
     elif direction == 'down':
         pyautogui.scroll(-amount)
     return 'OK'
+
 
 @app.route('/back')
 def back():

@@ -21,7 +21,6 @@
         font-size: 16px;
         opacity: 0.7;
       }
-      #btnFullScreen { top: 10px; right: 10px; }
       #btnBack { top: 10px; left: 10px; }
       audio {
         width: 100%;
@@ -33,7 +32,7 @@
 </head>
 <body>
     <img id="screen" src="/video_feed" />
-    <button id="btnFullScreen">全螢幕</button>
+
     <button id="btnBack">回上一步</button>
     <button id="btnNextTrack" style="top: 60px; left: 10px;">下一首</button>
 <button id="btnRandom" style="top: 110px; left: 10px;">隨機播放</button>
@@ -45,18 +44,10 @@
 
     <script>
   const screen = document.getElementById('screen');
-  const btnFullScreen = document.getElementById('btnFullScreen');
   const btnBack = document.getElementById('btnBack');
   const btnNextTrack = document.getElementById('btnNextTrack');
   const btnRandom = document.getElementById('btnRandom');
 
-  btnFullScreen.onclick = () => {
-    if (!document.fullscreenElement) {
-      screen.requestFullscreen().catch(console.error);
-    } else {
-      document.exitFullscreen();
-    }
-  };
 
   btnBack.onclick = () => {
     fetch('/back');
@@ -85,7 +76,7 @@
     }
   });
 
-  // ✅ 滑動事件處理：當使用者在影像上滑動時同步電腦滑動
+  // 滑動事件處理：當使用者在影像上滑動時同步電腦滑動
   let lastY = null;
 
   screen.addEventListener('touchstart', e => {
