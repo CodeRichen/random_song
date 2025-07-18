@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>手機控制電腦</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+    <style>
+      body, html { margin:0; padding:0; height:100%; background:black; overflow:hidden; }
+      #screen {
+        width: 100vw;
+        height: 56.25vw;
+        max-height: 100vh;
+        display: block;
+        margin: auto;
+        background: black;
+      }
+      button {
+        position: fixed;
+        z-index: 999;
+        padding: 10px 15px;
+        font-size: 16px;
+        opacity: 0.7;
+      }
+      #btnFullScreen { top: 10px; right: 10px; }
+      #btnBack { top: 10px; left: 10px; }
+      audio {
+        width: 100%;
+        position: fixed;
+        bottom: 0; left: 0;
+        z-index: 998;
+      }
+    </style>
+</head>
+<body>
+    <img id="screen" src="/video_feed" />
+    <button id="btnFullScreen">全螢幕</button>
+    <button id="btnBack">回上一步</button>
+    <button id="btnNextTrack" style="top: 60px; left: 10px;">下一首</button>
+<button id="btnRandom" style="top: 110px; left: 10px;">隨機播放</button>
+
+    <audio id="audioPlayer" controls autoplay>
+      <source src="/audio" type="audio/mpeg">
+      您的瀏覽器不支援 audio 元素。
+    </audio>
+
+    <script>
+  const screen = document.getElementById('screen');
+  const btnFullScreen = document.getElementById('btnFullScreen');
+  const btnBack = document.getElementById('btnBack');
+  const btnNextTrack = document.getElementById('btnNextTrack');
+  const btnRandom = document.getElementById('btnRandom');
+
+  btnFullScreen.onclick = () => {
+    if (!document.fullscreenElement) {
+      screen.requestFullscreen().catch(console.error);
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  btnBack.onclick = () => {
+    fetch('/back');
+  };
+
+  btnNextTrack.onclick = () => {
+    fetch('/next_track');
+  };
+
+  btnRandom.onclick = () => {
+    fetch('/random_click');
+  };
+
+  screen.addEventListener('click', function(e) {
+    const rect = screen.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width;
+    const relY = (e.clientY - rect.top) / rect.height;
+    fetch(`/click?x=${relX}&y=${relY}`);
+  });
+
+  screen.addEventListener('dblclick', function() {
+    if (!document.fullscreenElement) {
+      screen.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  // ✅ 滑動事件處理：當使用者在影像上滑動時同步電腦滑動
+  let lastY = null;
+
+  screen.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      lastY = e.touches[0].clientY;
+    }
+  });
+
+  screen.addEventListener('touchmove', e => {
+    if (e.touches.length === 1 && lastY !== null) {
+      const currentY = e.touches[0].clientY;
+      const deltaY = lastY - currentY;
+      if (Math.abs(deltaY) > 5) {
+        const direction = deltaY > 0 ? 'down' : 'up';
+        const amount = Math.abs(deltaY) * 2; // 根據手勢距離決定 scroll 強度
+        const formData = new FormData();
+        formData.append('direction', direction);
+        formData.append('amount', amount.toString());
+        fetch('/scroll', { method: 'POST', body: formData });
+        lastY = currentY;
+      }
+    }
+  });
+
+  screen.addEventListener('touchend', () => {
+    lastY = null;
+  });
+</script>
+
+</body>
+</html>
